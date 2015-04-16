@@ -15,6 +15,7 @@ namespace AzirTheEmperorOfSoloQueue
         internal static List<Spell> Spells = new List<Spell>();
         internal static Orbwalking.Orbwalker Orb;
         internal static Vector3 lastSoldierPosition = new Vector3();
+        internal static Vector3 IsWithinSoldierRange = new Vector3();
         internal static float whenToCast;
 
         static void Main(string[] args)
@@ -57,7 +58,7 @@ namespace AzirTheEmperorOfSoloQueue
             }
             sel.AddItem(new MenuItem("useR", "Use R").SetValue(true));
             sel.AddItem(new MenuItem("useAA", "Auto-Attack targets in range").SetValue(true));
-            sel.AddItem(new MenuItem("trainMode", "Azir Express").SetValue(new KeyBind('Z', KeyBindType.Press)));
+            //sel.AddItem(new MenuItem("trainMode", "Azir Express").SetValue(new KeyBind('Z', KeyBindType.Press)));
             sel.AddSubMenu(useE);
             Config.AddSubMenu(sel);
 
@@ -102,7 +103,7 @@ namespace AzirTheEmperorOfSoloQueue
             
             //            if (Player.InFountain() || Player.IsRecalling()) return;
             VectorManager.RemoveCorruptedSoldiers();
-            EscapeMode();
+            //EscapeMode();
             FightMode();
             HarassMode();
             LaneClear();
@@ -315,32 +316,34 @@ namespace AzirTheEmperorOfSoloQueue
                 }
             }
         }
-        internal static void EscapeMode()
-        {
-            if (!Config.Item("trainMode").GetValue<KeyBind>().Active) return;
-            Orbwalking.Orbwalk(null, Game.CursorPos);
-            if (W.IsReady())
-            {
-                if (ObjectManager.Player.GetSpell(SpellSlot.E).State == SpellState.Surpressed ||Emperor.E.IsReady())
-                {
-                    var where = VectorManager.MaxSoldierPosition(Game.CursorPos);
-                    lastSoldierPosition = where;
-                    W.Cast(where);
-                }
-                if (Emperor.E.IsReady())
-                {
-                    var extended = ObjectManager.Player.ServerPosition.To2D()
-                        .Extend(Game.CursorPos.To2D(), Emperor.Q.Range - 25);
-                    SetWhenToCast();
+        //internal static void EscapeMode()
+        //{
+          //  if (!Config.Item("trainMode").GetValue<KeyBind>().Active) return;
+        //    Orbwalking.Orbwalk(null, Game.CursorPos);
+         //   if (W.IsReady())
+          //  {
+            //    if (ObjectManager.Player.GetSpell(SpellSlot.E).State == SpellState.Surpressed ||E.IsReady())
+            //    {
+              //      var where = VectorManager.MaxSoldierPosition(Game.CursorPos);
+              //      lastSoldierPosition = where;
+               //     W.Cast(where);
+               // }
+              //  if (E.IsReady() || ObjectManager.Player.GetSpell(SpellSlot.E).State == SpellState.Surpressed)
+              //  {
+              //      if (E.IsReady() || ObjectManager.Player.GetSpell(SpellSlot.E).State == SpellState.Surpressed)
+                 //   {
+                  //      SetWhenToCast();
+                  //      E.Cast(lastSoldierPosition, true);
+                //    }
                 }
 
-                if (QTrain.IsReady() && Environment.TickCount - whenToCast > 0)
-                {
-                    Q.Cast(ObjectManager.Player.Position + Vector3.Normalize(Game.CursorPos - ObjectManager.Player.Position) * Q.Range, true);
-                }
+               // if (QTrain.IsReady() && Environment.TickCount - whenToCast > 0)
+               // {
+                //    Q.Cast(ObjectManager.Player.Position + Vector3.Normalize(Game.CursorPos - ObjectManager.Player.Position) * Q.Range, true);
+               // }
 
 
             }
-        }
-    }
-}
+        //}
+    //}
+//}
