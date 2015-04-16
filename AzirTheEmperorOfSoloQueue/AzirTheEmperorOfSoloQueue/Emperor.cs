@@ -19,17 +19,18 @@ namespace AzirTheEmperorOfSoloQueue
 
         static void Main(string[] args)
         {
+            if (args == null) throw new ArgumentNullException("args");
             CustomEvents.Game.OnGameLoad += Game_OnGameLoad;
         }
 
         internal static void Game_OnGameLoad(EventArgs args)
         {
-            Config = new Menu("Azir - SoloQ God","azir",true);
+            Config = new Menu("Azir - SoloQ God", "azir", true);
             var ts = new Menu("Target Selector", "ts");
             TargetSelector.AddToMenu(ts);
             Config.AddSubMenu(ts);
 
-            var orbz = new Menu("Orbwalker","orb");
+            var orbz = new Menu("Orbwalker", "orb");
             Orb = new Orbwalking.Orbwalker(orbz);
             Config.AddSubMenu(orbz);
 
@@ -39,7 +40,7 @@ namespace AzirTheEmperorOfSoloQueue
             laneClear.AddItem(new MenuItem("useQ_LC", "Use Q").SetValue(false));
             laneClear.AddItem(new MenuItem("useW_LC", "Use W").SetValue(false));
             laneClear.AddItem(new MenuItem("useW_TURRET_LC", "Use W on turret's").SetValue(false));
-            laneClear.AddItem(new MenuItem("useW_TURRET_LC_X", "Only use if I have > X (W) stacks").SetValue(new Slider(1,2)));
+            laneClear.AddItem(new MenuItem("useW_TURRET_LC_X", "Only use if I have > X (W) stacks").SetValue(new Slider(1, 2)));
             sel.AddSubMenu(laneClear);
 
             var insec = new Menu("InSec", "insec");
@@ -48,11 +49,11 @@ namespace AzirTheEmperorOfSoloQueue
             sel.AddSubMenu(insec);
 
             var useE = new Menu("Use E", "useeE");
-            useE.AddItem(new MenuItem("eDive", "Turret dive (Toggle)").SetValue(new KeyBind('X',KeyBindType.Toggle)));
+            useE.AddItem(new MenuItem("eDive", "Turret dive (Toggle)").SetValue(new KeyBind('X', KeyBindType.Toggle)));
             useE.AddItem(new MenuItem("useE", "Use E").SetValue(true));
             foreach (var minion in ObjectManager.Get<Obj_AI_Hero>().Where(h => h.IsEnemy))
             {
-                useE.AddItem(new MenuItem("useE_"+minion.BaseSkinName,"Use E on " + minion.BaseSkinName).SetValue(true));
+                useE.AddItem(new MenuItem("useE_" + minion.BaseSkinName, "Use E on " + minion.BaseSkinName).SetValue(true));
             }
             sel.AddItem(new MenuItem("useR", "Use R").SetValue(true));
             sel.AddItem(new MenuItem("useAA", "Auto-Attack targets in range").SetValue(true));
@@ -94,11 +95,12 @@ namespace AzirTheEmperorOfSoloQueue
         internal static void SetWhenToCast()
         {
             var speed = ObjectManager.Player.GetSpell(SpellSlot.Q).SData.MissileSpeed;
-            whenToCast = (ObjectManager.Player.Distance(lastSoldierPosition) / speed) - (Game.Ping / 2);
+            whenToCast = (ObjectManager.Player.Distance(lastSoldierPosition) / speed) - (Game.Ping / 1);
         }
         internal static void Game_OnUpdate(EventArgs args)
         {
-//            if (Player.InFountain() || Player.IsRecalling()) return;
+            
+            //            if (Player.InFountain() || Player.IsRecalling()) return;
             VectorManager.RemoveCorruptedSoldiers();
             EscapeMode();
             FightMode();
@@ -125,7 +127,7 @@ namespace AzirTheEmperorOfSoloQueue
                 if (Config.Item("useR").GetValue<bool>() &&
                     ObjectManager.Player.GetSpellDamage(minion, SpellSlot.R) > minion.Health)
                 {
-//                    R.Cast(minion, true);
+                    //                    R.Cast(minion, true);
                 }
             }
         }
@@ -137,7 +139,7 @@ namespace AzirTheEmperorOfSoloQueue
             {
                 miniList.Add(dumbVector.Position.To2D());
             }
-            var pos = MinionManager.GetBestLineFarmLocation(miniList,Q.Width,Q.Range).Position;
+            var pos = MinionManager.GetBestLineFarmLocation(miniList, Q.Width, Q.Range).Position;
             var pos2 = MinionManager.GetBestCircularFarmLocation(miniList, W.Width, W.Range).Position;
             foreach (var minion in MinionManager.GetMinions(Q.Range))
             {
@@ -194,7 +196,7 @@ namespace AzirTheEmperorOfSoloQueue
             }
             if (Q.IsReady())
             {
-                if (!VectorManager.IsWithinSoldierRange(target) && VectorManager.AzirObjects.Any(obj => obj.Position.Distance(target.Position,false) >= 400f))
+                if (!VectorManager.IsWithinSoldierRange(target) && VectorManager.AzirObjects.Any(obj => obj.Position.Distance(target.Position, false) >= 400f))
                 {
                     Q.Cast(target, true);
                 }
@@ -205,7 +207,7 @@ namespace AzirTheEmperorOfSoloQueue
         internal static void FightMode()
         {
             if (Orbwalking.OrbwalkingMode.Combo != Orb.ActiveMode) return;
-            var target = TargetSelector.GetTarget(1250+450, TargetSelector.DamageType.Magical);
+            var target = TargetSelector.GetTarget(1250 + 450, TargetSelector.DamageType.Magical);
             if (target == null) return;
             if (VectorManager.IsWithinSoldierRange(target) && Config.Item("useAA").GetValue<bool>())
             {
@@ -217,16 +219,16 @@ namespace AzirTheEmperorOfSoloQueue
             }
             if (W.IsReady())
             {
-                if (VectorManager.AzirObjects.Count < 2 && target.Distance(VectorManager.MaxSoldierPosition(target.Position),true) <= 450)
+                if (VectorManager.AzirObjects.Count < 2 && target.Distance(VectorManager.MaxSoldierPosition(target.Position), true) <= 450)
                 {
-                    W.Cast(ObjectManager.Player.Distance(target,false) >= 450 ? VectorManager.MaxSoldierPosition(target.Position) : target.Position, true);
+                    W.Cast(ObjectManager.Player.Distance(target, false) >= 450 ? VectorManager.MaxSoldierPosition(target.Position) : target.Position, true);
                     Orbwalking.ResetAutoAttackTimer();
                     ObjectManager.Player.IssueOrder(GameObjectOrder.AttackUnit, target);
                 }
-                if (!Q.IsReady() && ObjectManager.Player.Distance(target,false) <= 800f)
-                    // we use double because azir soldier double our range.
+                if (!Q.IsReady() && ObjectManager.Player.Distance(target, false) <= 800f)
+                // we use double because azir soldier double our range.
                 {
-                    W.Cast(ObjectManager.Player.Distance(target,false) >= 450 ? VectorManager.MaxSoldierPosition(target.Position) : target.Position,true);
+                    W.Cast(ObjectManager.Player.Distance(target, false) >= 450 ? VectorManager.MaxSoldierPosition(target.Position) : target.Position, true);
                     Orbwalking.ResetAutoAttackTimer();
                     ObjectManager.Player.IssueOrder(GameObjectOrder.AttackUnit, target);
                 }
@@ -237,7 +239,7 @@ namespace AzirTheEmperorOfSoloQueue
             }
             var myPos = ObjectManager.Player.Position;
             var nearest = VectorManager.GetSoldierNearPosition(target.Position).Position;
-            if (Config.Item("useE").GetValue<bool>() && Config.Item("useE_"+target.BaseSkinName).GetValue<bool>())// && nearest.Distance(target.Position) <= 450 && E.IsReady() && (myPos.Y*nearest.X - myPos.X*nearest.Y) - (myPos.Y*target.Position.X - myPos.X*target.Position.Y) <= 0)
+            if (Config.Item("useE").GetValue<bool>() && Config.Item("useE_" + target.BaseSkinName).GetValue<bool>())// && nearest.Distance(target.Position) <= 450 && E.IsReady() && (myPos.Y*nearest.X - myPos.X*nearest.Y) - (myPos.Y*target.Position.X - myPos.X*target.Position.Y) <= 0)
             {
                 var projection = target.Position.To2D().ProjectOn(ObjectManager.Player.Position.To2D(), nearest.To2D());
                 if (projection.IsOnSegment)
@@ -256,7 +258,7 @@ namespace AzirTheEmperorOfSoloQueue
                 var target = TargetSelector.GetTarget(1200, TargetSelector.DamageType.Magical);
 
                 var pos = target.Position.Extend(ObjectManager.Player.Position, -250);
-                if(W.IsReady())
+                if (W.IsReady())
                 {
                     if (ObjectManager.Player.GetSpell(SpellSlot.E).State == SpellState.Surpressed || E.IsReady())
                     {
@@ -274,14 +276,14 @@ namespace AzirTheEmperorOfSoloQueue
                         Q.Cast(ObjectManager.Player.Position + Vector3.Normalize(pos - ObjectManager.Player.Position) * Q.Range, true);
                     }
                 }
-                if (R.IsReady() && ObjectManager.Player.Distance(target,false) < 250)
+                if (R.IsReady() && ObjectManager.Player.Distance(target, false) < 250)
                 {
                     var whereToInsec = Config.Item("insecWhere").GetValue<StringList>().SelectedIndex;
                     // 1 = Team, 2 = Turret, 3 = Last pos
-                    switch(whereToInsec)
+                    switch (whereToInsec)
                     {
                         case 1:
-                            var end = ObjectManager.Player.Position.Extend(ObjectManager.Get<Obj_AI_Hero>().FirstOrDefault(h => h.IsAlly && h.IsVisible && h.Distance(ObjectManager.Player,false) < 1200).Position,R.Range);
+                            var end = ObjectManager.Player.Position.Extend(ObjectManager.Get<Obj_AI_Hero>().FirstOrDefault(h => h.IsAlly && h.IsVisible && h.Distance(ObjectManager.Player, false) < 1200).Position, R.Range);
                             var obj = Geometry.VectorMovementCollision(ObjectManager.Player.Position.To2D(), end.To2D(), R.Speed, target.Position.To2D(), target.MoveSpeed, R.Delay);
                             foreach (var wtf in obj)
                             {
@@ -290,7 +292,7 @@ namespace AzirTheEmperorOfSoloQueue
                             }
                             break;
                         case 2:
-                            var turret = ObjectManager.Player.Position.Extend(ObjectManager.Get<Obj_AI_Turret>().OrderBy(h => h.Distance(ObjectManager.Player,false)).FirstOrDefault(t => t.IsValid).Position,R.Range);
+                            var turret = ObjectManager.Player.Position.Extend(ObjectManager.Get<Obj_AI_Turret>().OrderBy(h => h.Distance(ObjectManager.Player, false)).FirstOrDefault(t => t.IsValid).Position, R.Range);
                             var TurretObj = Geometry.VectorMovementCollision(ObjectManager.Player.Position.To2D(), turret.To2D(), R.Speed, target.Position.To2D(), target.MoveSpeed, R.Delay);
                             foreach (var wtf in TurretObj)
                             {
@@ -300,11 +302,11 @@ namespace AzirTheEmperorOfSoloQueue
                             break;
                         case 3:
                         default:
-                            var lastpos = ObjectManager.Player.Position.Extend(oldPos,R.Range);
+                            var lastpos = ObjectManager.Player.Position.Extend(oldPos, R.Range);
                             var lastPosObj = Geometry.VectorMovementCollision(ObjectManager.Player.Position.To2D(), lastpos.To2D(), R.Speed, target.Position.To2D(), target.MoveSpeed, R.Delay);
                             foreach (var wtf in lastPosObj)
                             {
-                                Game.PrintChat(""+wtf);
+                                Game.PrintChat("" + wtf);
                                 if (wtf != "NaN")
                                     R.Cast(lastpos, true);
                             }
@@ -319,21 +321,25 @@ namespace AzirTheEmperorOfSoloQueue
             Orbwalking.Orbwalk(null, Game.CursorPos);
             if (W.IsReady())
             {
-                if (ObjectManager.Player.GetSpell(SpellSlot.E).State == SpellState.Surpressed || E.IsReady())
+                if (ObjectManager.Player.GetSpell(SpellSlot.E).State == SpellState.Surpressed ||Emperor.E.IsReady())
                 {
                     var where = VectorManager.MaxSoldierPosition(Game.CursorPos);
                     lastSoldierPosition = where;
                     W.Cast(where);
                 }
-                if (E.IsReady() || ObjectManager.Player.GetSpell(SpellSlot.E).State == SpellState.Surpressed)
+                if (Emperor.E.IsReady())
                 {
+                    var extended = ObjectManager.Player.ServerPosition.To2D()
+                        .Extend(Game.CursorPos.To2D(), Emperor.Q.Range - 25);
                     SetWhenToCast();
-                    E.Cast(lastSoldierPosition, true);
                 }
+
                 if (QTrain.IsReady() && Environment.TickCount - whenToCast > 0)
                 {
                     Q.Cast(ObjectManager.Player.Position + Vector3.Normalize(Game.CursorPos - ObjectManager.Player.Position) * Q.Range, true);
                 }
+
+
             }
         }
     }
