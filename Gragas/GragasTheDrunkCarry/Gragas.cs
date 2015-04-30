@@ -222,8 +222,8 @@ namespace GragasTheDrunkCarry
         private static void InsecCombo(Vector2 pos)
         {
             var vTarget = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
-            if (!(vTarget.Distance(pos) <= 700)) return;
-            var newpos = pos.Extend(vTarget.Position.To2D(), 700);
+            if (!(vTarget.Distance(pos) <= 600)) return;
+            var newpos = pos.Extend(vTarget.Position.To2D(), 600);
             if (((Environment.TickCount - LastMove) > 50))
             {
                 Q.Cast(newpos, true);
@@ -238,10 +238,10 @@ namespace GragasTheDrunkCarry
 
         public static void Insec(Obj_AI_Hero target)
         {
-            Rpos = Player.Position.To2D().Extend(target.Position.To2D(), Player.Distance(target) + 250);
+            Rpos = Player.Position.To2D().Extend(target.Position.To2D(), Player.Distance(target) + 240);
             if (Rpos.Distance(Player.Position) < R.Range-20)
             {
-                if (Player.Distance(Rpos.Extend(target.Position.To2D(), 700 - target.Distance(Rpos))) < E.Range && !IsWall(Rpos.To3D()) && target.IsFacing(Player))
+                if (Player.Distance(Rpos.Extend(target.Position.To2D(), 600 - target.Distance(Rpos))) < E.Range && !IsWall(Rpos.To3D()) && target.IsFacing(Player))
                 {
                     R.Cast(Rpos);
                 }
